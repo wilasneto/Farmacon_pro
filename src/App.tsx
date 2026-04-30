@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -111,6 +111,38 @@ export default function App() {
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // --- Cálculos Automáticos ---
+  const totals = useMemo(() => {
+    const totalHonorarios = formData.empresas.reduce((acc, emp) => {
+      const val = emp.honorario ? Number(emp.honorario) : 0;
+      return acc + val;
+    }, 0);
+
+    const totalCnpjs = formData.empresas.length;
+
+    const totalFuncionarios = formData.empresas.reduce((acc, emp) => {
+      const reg = emp.funcionariosRegistrados ? Number(emp.funcionariosRegistrados) : 0;
+      const sem = emp.funcionariosSemRegistro ? Number(emp.funcionariosSemRegistro) : 0;
+      return acc + reg + sem;
+    }, 0);
+
+    return {
+      totalHonorarios: String(totalHonorarios),
+      totalCnpjs: String(totalCnpjs),
+      totalFuncionarios: String(totalFuncionarios)
+    };
+  }, [formData.empresas]);
+
+  // Sincronizar totais com formData para o PDF
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      totalHonorarios: totals.totalHonorarios,
+      totalCnpjs: totals.totalCnpjs,
+      totalFuncionarios: totals.totalFuncionarios
+    }));
+  }, [totals, setFormData]);
 
   // --- Logic Helpers ---
 
@@ -252,7 +284,7 @@ export default function App() {
         ['Regime Tributário', emp.regimeTributario],
         ['Farmácia Popular', emp.farmaciaPopular],
         ['Sistema / Rede', `${emp.sistema} - ${emp.rede}`],
-        ['Funcionários (Reg/SR)', `${emp.funcionariosRegistrados} / ${emp.funcionariosSemRegistro}`],
+        ['Funcionários (Reg/Sem Registro)', `${emp.funcionariosRegistrados} / ${emp.funcionariosSemRegistro}`],
         ['Fat. Declarado', formatCurrency(emp.faturamentoDeclarado)]
       ];
       if (type === 'seller') {
@@ -491,13 +523,13 @@ export default function App() {
                                     const list = [...formData.empresas]; list[i].honorario = val; setFormData(p => ({...p, empresas: list}));
                                   }} className="w-full p-3 border border-blue-100 rounded-xl text-sm font-black text-blue-600" />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   <div className="space-y-1">
-                                    <label className="text-[8px] font-bold text-slate-400 uppercase">Reg.</label>
+                                    <label className="text-[8px] font-bold text-slate-400 uppercase leading-tight block">Funcionários Registrados</label>
                                     <input type="number" value={emp.funcionariosRegistrados} name="funcionariosRegistrados" onChange={(e)=>handleEmpresaChange(i, e)} className="w-full p-2 border rounded-lg text-xs" />
                                   </div>
                                   <div className="space-y-1">
-                                    <label className="text-[8px] font-bold text-slate-400 uppercase">SR.</label>
+                                    <label className="text-[8px] font-bold text-slate-400 uppercase leading-tight block">Funcionários Sem registro</label>
                                     <input type="number" value={emp.funcionariosSemRegistro} name="funcionariosSemRegistro" onChange={(e)=>handleEmpresaChange(i, e)} className="w-full p-2 border rounded-lg text-xs" />
                                   </div>
                                 </div>
@@ -620,15 +652,21 @@ export default function App() {
                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 text-left">
                             <div className="space-y-3">
                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest underline decoration-blue-600 underline-offset-4">Total de Honorários</label>
-                               <input value={formData.totalHonorarios ? formatCurrency(formData.totalHonorarios) : ''} onChange={(e)=>setFormData(p=>({...p, totalHonorarios: e.target.value.replace(/\D/g, '')}))} className="w-full bg-slate-800 border-none p-4 md:p-5 rounded-2xl md:rounded-3xl text-2xl md:text-3xl font-black text-blue-400 shadow-inner" />
+                               <div className="w-full bg-slate-800 p-4 md:p-5 rounded-2xl md:rounded-3xl text-2xl md:text-3xl font-black text-blue-400 shadow-inner">
+                                 {formatCurrency(totals.totalHonorarios)}
+                               </div>
                             </div>
                             <div className="space-y-3">
                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Hash size={12}/> Total de CNPJs</label>
-                               <input type="number" name="totalCnpjs" value={formData.totalCnpjs} onChange={handleInputChange} className="w-full bg-slate-800 border-none p-4 md:p-5 rounded-2xl md:rounded-3xl text-2xl md:text-3xl font-black shadow-inner" />
+                               <div className="w-full bg-slate-800 p-4 md:p-5 rounded-2xl md:rounded-3xl text-2xl md:text-3xl font-black text-white shadow-inner">
+                                 {totals.totalCnpjs}
+                               </div>
                             </div>
                             <div className="space-y-3">
                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Users size={12}/> Total Funcionários</label>
-                               <input type="number" name="totalFuncionarios" value={formData.totalFuncionarios} onChange={handleInputChange} className="w-full bg-slate-800 border-none p-4 md:p-5 rounded-2xl md:rounded-3xl text-2xl md:text-3xl font-black shadow-inner" />
+                               <div className="w-full bg-slate-800 p-4 md:p-5 rounded-2xl md:rounded-3xl text-2xl md:text-3xl font-black text-white shadow-inner">
+                                 {totals.totalFuncionarios}
+                               </div>
                             </div>
                          </div>
                          <div className="space-y-3 text-left">
