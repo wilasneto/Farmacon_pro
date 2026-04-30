@@ -1,6 +1,6 @@
 {
-  "name": "Gerador de Formulários PDF",
-  "description": "Formulário para captura de leads com geração de PDFs personalizados para cliente e vendedor.",
+  "name": "Farmacon Pro",
+  "description": "Sistema especializado para geração de relatórios e gestão de formulários farmacêuticos.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }
