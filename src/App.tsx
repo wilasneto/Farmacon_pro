@@ -203,7 +203,7 @@ export default function App() {
     let y = 50; // Margem superior inicial para respeitar o cabeçalho do timbrado
 
     const drawSection = (title: string, fields: [string, string][]) => {
-      if (y > 240) { 
+      if (y > 210) { 
         doc.addPage(); 
         applyLetterhead();
         y = 45; 
@@ -217,7 +217,7 @@ export default function App() {
       y += 12;
 
       fields.forEach(([label, value]) => {
-        if (y > 275) { 
+        if (y > 227) { 
           doc.addPage(); 
           applyLetterhead();
           y = 45; 
@@ -302,7 +302,7 @@ export default function App() {
        y += 15;
 
        formData.solicitacoes.forEach((sol, i) => {
-         if (y > 270) { 
+         if (y > 227) { 
            doc.addPage(); 
            applyLetterhead();
            y = 45; 
