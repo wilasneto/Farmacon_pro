@@ -182,21 +182,32 @@ export default function App() {
   const generatePDF = async (type: 'client' | 'seller') => {
     const doc = new jsPDF('p', 'mm', 'a4');
     
-    // Watermark/Letterhead
-    try {
-      const img = new Image();
-      await new Promise((resolve) => {
-        img.crossOrigin = 'anonymous';
-        img.onload = () => { doc.addImage(img, 'PNG', 0, 0, 210, 297); resolve(null); };
-        img.onerror = () => resolve(null);
-        img.src = LETTERHEAD_URL;
-      });
-    } catch (e) { console.error(e); }
+    // 1. Carregar imagem do Timbrado
+    const img = new Image();
+    const hasImg = await new Promise((resolve) => {
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = LETTERHEAD_URL;
+    });
 
-    let y = 80;
+    const applyLetterhead = () => {
+      if (hasImg) {
+        doc.addImage(img, 'PNG', 0, 0, 210, 297);
+      }
+    };
+
+    // Aplicar na primeira página
+    applyLetterhead();
+
+    let y = 80; // Margem superior inicial para respeitar o cabeçalho do timbrado
 
     const drawSection = (title: string, fields: [string, string][]) => {
-      if (y > 240) { doc.addPage(); y = 35; }
+      if (y > 240) { 
+        doc.addPage(); 
+        applyLetterhead();
+        y = 45; 
+      }
       doc.setFillColor(31, 41, 55);
       doc.rect(20, y, 170, 7, 'F');
       doc.setTextColor(255);
@@ -206,7 +217,11 @@ export default function App() {
       y += 12;
 
       fields.forEach(([label, value]) => {
-        if (y > 275) { doc.addPage(); y = 35; }
+        if (y > 275) { 
+          doc.addPage(); 
+          applyLetterhead();
+          y = 45; 
+        }
         doc.setTextColor(148, 163, 184);
         doc.setFontSize(7);
         doc.text(label.toUpperCase(), 25, y);
@@ -278,7 +293,8 @@ export default function App() {
     // 6. Solicitações (EXCLUSIVE SELLER)
     if (type === 'seller') {
        doc.addPage();
-       y = 35;
+       applyLetterhead();
+       y = 45;
        doc.setFillColor(37, 99, 235);
        doc.rect(20, y, 170, 8, 'F');
        doc.setTextColor(255);
@@ -286,7 +302,11 @@ export default function App() {
        y += 15;
 
        formData.solicitacoes.forEach((sol, i) => {
-         if (y > 270) { doc.addPage(); y = 35; }
+         if (y > 270) { 
+           doc.addPage(); 
+           applyLetterhead();
+           y = 45; 
+         }
          doc.setFont('helvetica', 'bold');
          doc.setTextColor(30, 41, 59);
          doc.text(`SOLICITAÇÃO ${i+1}: ${sol.titulo?.toUpperCase() || 'SEM TÍTULO'}`, 25, y);
