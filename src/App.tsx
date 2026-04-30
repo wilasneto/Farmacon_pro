@@ -328,11 +328,6 @@ export default function App() {
               key={i} 
               onClick={() => {
                 if (isSubmitted) return;
-                // If we are currently in step 1 and trying to go forward, validate
-                if (activeStep === 1 && i > 1) {
-                  const hasInvalidCnpj = formData.empresas.some(emp => emp.cnpj.replace(/\D/g, '').length < 14);
-                  if (hasInvalidCnpj) return;
-                }
                 setActiveStep(i);
               }}
               className={`p-3 md:px-4 md:py-2 rounded-full transition-all flex items-center justify-center gap-2 shrink-0 min-w-[48px] min-h-[48px] md:min-h-0 ${activeStep === i ? 'bg-blue-600 text-white shadow-xl shadow-blue-100 scale-110 md:scale-100' : 'text-slate-400 hover:text-slate-600'}`}
@@ -682,7 +677,18 @@ export default function App() {
                             </div>
                          </div>
                          <button 
-                           onClick={() => { setLoading(true); setTimeout(()=>{ setLoading(false); setIsSubmitted(true); }, 1200); }}
+                          onClick={() => {
+                            if (activeStep === 4) {
+                              const hasInvalidCnpj = formData.empresas.some(emp => emp.cnpj.replace(/\D/g, '').length < 14);
+                              if (hasInvalidCnpj) {
+                                alert("Por favor, preencha todos os CNPJs corretamente nas 'Unidades' antes de emitir o relatório.");
+                                setActiveStep(1);
+                                return;
+                              }
+                            }
+                            setLoading(true); 
+                            setTimeout(()=>{ setLoading(false); setIsSubmitted(true); }, 1200); 
+                          }}
                            className="w-full max-w-md py-6 bg-slate-900 text-white font-black rounded-[2.5rem] shadow-[0_20px_50px_rgba(30,41,59,0.3)] text-2xl tracking-tighter hover:scale-105 active:scale-95 transition-all uppercase"
                          >
                            {loading ? 'COMPILANDO...' : 'EMITIR RELATÓRIOS'}
@@ -702,17 +708,9 @@ export default function App() {
                        </div>
                        <button 
                          onClick={() => {
-                           if (activeStep === 1) {
-                             const hasInvalidCnpj = formData.empresas.some(emp => emp.cnpj.replace(/\D/g, '').length < 14);
-                             if (hasInvalidCnpj) return;
-                           }
                            setActiveStep(s => Math.min(4, s+1));
                          }} 
-                         className={`w-full md:w-auto bg-slate-900 text-white px-10 py-5 md:py-4 rounded-full font-black text-xs transition-all shadow-xl shadow-slate-100 flex items-center justify-center gap-3 order-3 ${
-                           activeStep === 1 && formData.empresas.some(emp => emp.cnpj.replace(/\D/g, '').length < 14)
-                             ? 'opacity-50 cursor-not-allowed grayscale'
-                             : 'hover:bg-blue-600'
-                         }`}
+                         className="w-full md:w-auto bg-slate-900 text-white px-10 py-5 md:py-4 rounded-full font-black text-xs transition-all shadow-xl shadow-slate-100 flex items-center justify-center gap-3 order-3 hover:bg-blue-600"
                        >
                          PROSSEGUIR <ArrowRight size={18}/>
                        </button>
