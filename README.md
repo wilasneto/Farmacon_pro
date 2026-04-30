@@ -1,11 +1,20 @@
-<div align="center">
+# Farmacon Pro Docs
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+Sistema avançado de geração de propostas comerciais e fichas técnicas para o grupo Farmacon.
 
-  <h1>Built with AI Studio</h2>
+## Funcionalidades
+- **Geração de PDF Duplo:** Emite uma versão para o cliente (limpa e comercial) e uma versão para o vendedor (com detalhes internos e solicitações).
+- **Dados Empresariais Dinâmicos:** Suporte para até 20 empresas por grupo com validação rigorosa de CNPJ.
+- **Aba de Particularidades:** Controle de até 31 solicitações internas com definição de título, setor responsável e urgência.
+- **Segurança de Dados:** Ocultação automática de campos sensíveis (honorários reais, faturamentos reais e notas internas) na versão do cliente.
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## Tecnologias
+- React + TypeScript
+- Tailwind CSS (Interface Moderna/Bento Grid)
+- jsPDF (Emissão de documentos)
+- Lucide React (Iconografia)
+- Framer Motion (Transições e Animações)
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
-
-</div>
+## Como rodar localmente
+1. `npm install`
+2. `npm run dev`

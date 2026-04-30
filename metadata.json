@@ -1,0 +1,6 @@
+{
+  "name": "Gerador de Formulários PDF",
+  "description": "Formulário para captura de leads com geração de PDFs personalizados para cliente e vendedor.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
