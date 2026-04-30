@@ -200,7 +200,7 @@ export default function App() {
     // Aplicar na primeira página
     applyLetterhead();
 
-    let y = 80; // Margem superior inicial para respeitar o cabeçalho do timbrado
+    let y = 50; // Margem superior inicial para respeitar o cabeçalho do timbrado
 
     const drawSection = (title: string, fields: [string, string][]) => {
       if (y > 240) { 
