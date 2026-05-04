@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import { motion, AnimatePresence } from 'motion/react';
+import { LETTERHEAD_BASE64 } from './assets';
 import { 
   User, 
   Mail, 
@@ -85,7 +86,7 @@ interface FormData {
   solicitacoes: Solicitacao[];
 }
 
-const LETTERHEAD_URL = '/letterhead.png';
+const LETTERHEAD_URL = LETTERHEAD_BASE64;
 
 export default function App() {
   const [formData, setFormData] = useState<FormData>({
@@ -120,7 +121,7 @@ export default function App() {
       return acc + val;
     }, 0);
 
-    const totalCnpjs = formData.empresas.length;
+    const totalCnpjs = formData.empresas.filter(emp => emp.cnpj.trim() !== '' || emp.cpf.trim() !== '').length;
 
     const totalFuncionarios = formData.empresas.reduce((acc, emp) => {
       const reg = emp.funcionariosRegistrados ? Number(emp.funcionariosRegistrados) : 0;
@@ -331,7 +332,7 @@ export default function App() {
     // 5. Negociação
     drawSection('Negociação Final', [
       ['Total de Honorários', formatCurrency(formData.totalHonorarios)],
-      ['Contagem Geral', `CNPJs: ${formData.totalCnpjs} | Funcionários: ${formData.totalFuncionarios}`],
+      ['Contagem Geral', `CNPJs/CPFs: ${formData.totalCnpjs} | Funcionários: ${formData.totalFuncionarios}`],
       ['Classificação', formData.classificacao]
     ]);
 
@@ -681,7 +682,7 @@ export default function App() {
                                </div>
                             </div>
                             <div className="space-y-3">
-                               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Hash size={12}/> Total de CNPJs</label>
+                               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Hash size={12}/> Total de CNPJs/CPFs</label>
                                <div className="w-full bg-slate-800 p-4 md:p-5 rounded-2xl md:rounded-3xl text-2xl md:text-3xl font-black text-white shadow-inner">
                                  {totals.totalCnpjs}
                                </div>
@@ -761,9 +762,16 @@ export default function App() {
                          <button 
                           onClick={() => {
                             if (activeStep === 4) {
-                              const hasInvalidCnpj = formData.empresas.some(emp => emp.cnpj.replace(/\D/g, '').length < 14);
-                              if (hasInvalidCnpj) {
-                                alert("Por favor, preencha todos os CNPJs corretamente nas 'Unidades' antes de emitir o relatório.");
+                              const hasInvalidUnit = formData.empresas.some(emp => {
+                                const cnpjClean = emp.cnpj.replace(/\D/g, '');
+                                const cpfClean = emp.cpf.replace(/\D/g, '');
+                                // Inválido apenas se ambos estiverem preenchidos incorretamente ou ambos vazios
+                                const isCnpjValid = cnpjClean.length === 14;
+                                const isCpfValid = cpfClean.length === 11;
+                                return !isCnpjValid && !isCpfValid;
+                              });
+                              if (hasInvalidUnit) {
+                                alert("Por favor, preencha o CNPJ ou CPF corretamente para cada unidade antes de emitir o relatório.");
                                 setActiveStep(1);
                                 return;
                               }
