@@ -28,6 +28,7 @@ import {
 interface Empresa {
   razaoSocial: string;
   cnpj: string;
+  cpf: string;
   faturamentoDeclarado: string;
   faturamentoReal: string;
   uf: string;
@@ -90,7 +91,7 @@ export default function App() {
   const [formData, setFormData] = useState<FormData>({
     executivoRelacionamento: '', produto: '', grupo: '',
     empresas: [{
-      razaoSocial: '', cnpj: '', faturamentoDeclarado: '', faturamentoReal: '',
+      razaoSocial: '', cnpj: '', cpf: '', faturamentoDeclarado: '', faturamentoReal: '',
       uf: '', regimeTributario: '', honorario: '', dataPrimeiroPagamento: '',
       farmaciaPopular: 'Não', sistema: '', rede: '', funcionariosRegistrados: '', funcionariosSemRegistro: ''
     }],
@@ -161,12 +162,23 @@ export default function App() {
       .replace(/(\d{4})(\d)/, '$1-$2');
   };
 
+  const maskCPF = (value: string) => {
+    const digits = value.replace(/\D/g, '');
+    return digits
+      .slice(0, 11)
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1-$2');
+  };
+
   const handleEmpresaChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     const newEmpresas = [...formData.empresas];
     
     if (name === 'cnpj') {
       newEmpresas[index] = { ...newEmpresas[index], [name]: maskCNPJ(value) };
+    } else if (name === 'cpf') {
+      newEmpresas[index] = { ...newEmpresas[index], [name]: maskCPF(value) };
     } else {
       newEmpresas[index] = { ...newEmpresas[index], [name]: value };
     }
@@ -179,7 +191,7 @@ export default function App() {
       setFormData(prev => ({
         ...prev,
         empresas: [...prev.empresas, {
-          razaoSocial: '', cnpj: '', faturamentoDeclarado: '', faturamentoReal: '',
+          razaoSocial: '', cnpj: '', cpf: '', faturamentoDeclarado: '', faturamentoReal: '',
           uf: '', regimeTributario: '', honorario: '', dataPrimeiroPagamento: '',
           farmaciaPopular: 'Não', sistema: '', rede: '', funcionariosRegistrados: '', funcionariosSemRegistro: ''
         }]
@@ -280,6 +292,7 @@ export default function App() {
       const fields: [string, string][] = [
         ['Razão Social', emp.razaoSocial],
         ['CNPJ', emp.cnpj],
+        ['CPF', emp.cpf],
         ['UF', emp.uf],
         ['Regime Tributário', emp.regimeTributario],
         ['Farmácia Popular', emp.farmaciaPopular],
@@ -469,6 +482,17 @@ export default function App() {
                                       <AlertCircle size={8} /> CNPJ Incompleto
                                     </span>
                                   )}
+                                </div>
+                                <div className="space-y-2">
+                                  <label className="text-[9px] font-black text-slate-400 uppercase">CPF</label>
+                                  <input 
+                                    value={emp.cpf} 
+                                    name="cpf" 
+                                    onChange={(e)=>handleEmpresaChange(i, e)} 
+                                    className="w-full p-3 border border-slate-200 rounded-xl text-sm"
+                                    placeholder="000.000.000-00"
+                                    maxLength={14}
+                                  />
                                 </div>
                                 <div className="space-y-2">
                                   <label className="text-[9px] font-black text-slate-400 uppercase">UF</label>
