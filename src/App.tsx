@@ -727,7 +727,20 @@ export default function App() {
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-6 text-left">
                                 <div className="space-y-2">
                                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Setor Responsável</label>
-                                  <input value={sol.departamento} name="departamento" onChange={(e)=>handleSolicitacaoChange(i, e)} placeholder="Ex: Societário, TI..." className="w-full p-3 md:p-4 border rounded-xl md:rounded-2xl bg-white font-semibold" />
+                                  <select 
+                                    value={sol.departamento} 
+                                    name="departamento" 
+                                    onChange={(e)=>handleSolicitacaoChange(i, e)} 
+                                    className="w-full p-3 md:p-4 border rounded-xl md:rounded-2xl bg-white font-semibold"
+                                  >
+                                    <option value="">Selecione o setor...</option>
+                                    <option value="DEPARTAMENTO PESSOAL">DEPARTAMENTO PESSOAL</option>
+                                    <option value="FISCAL">FISCAL</option>
+                                    <option value="CONTÁBIL">CONTÁBIL</option>
+                                    <option value="COMPLIANCE">COMPLIANCE</option>
+                                    <option value="TRIBUTÁRIO">TRIBUTÁRIO</option>
+                                    <option value="LEGAL">LEGAL</option>
+                                  </select>
                                 </div>
                                 <div className="space-y-2">
                                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Nível de Urgência</label>
